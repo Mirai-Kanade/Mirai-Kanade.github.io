@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shadow Store</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000;
+            color: #fff;
+            font-family: 'Arial', sans-serif;
+            overflow-x: hidden;
+            cursor: none;
+            min-height: 100vh;
+        }
+
+        /* Custom Cursor Shadow */
+        .cursor-shadow {
+            position: fixed;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.1) 30%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 1;
+            transform: translate(-50%, -50%);
+            transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .cursor-shadow.hover {
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(76,175,80,0.4) 0%, rgba(76,175,80,0.2) 30%, transparent 70%);
+        }
+
+        .cursor-shadow.click {
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.4) 50%, transparent 80%);
+        }
+
+        /* Menu Toggle */
+        .menu-toggle {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            cursor: pointer;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .menu-toggle:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(255, 255, 255, 0.15);
+        }
+
+        .menu-toggle:active {
+            transform: scale(0.95);
+        }
+
+        .menu-lines {
+            width: 25px;
+            height: 3px;
+            background: linear-gradient(45deg, #fff, #4CAF50);
+            margin: 5px 0;
+            border-radius: 2px;
+            transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .menu-toggle:hover .menu-lines {
+            background: linear-gradient(45deg, #4CAF50, #fff);
+            transform: scaleX(1.1);
+        }
+
+        /* Sidebar Menu */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -250px;
+            width: 250px;
+            height: 100vh;
+            background: rgba(20, 20, 20, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 999;
+            transition: left 0.3s ease;
+            padding: 80px 20px 20px;
+        }
+
+        .sidebar.active {
+            left: 0;
+        }
+
+        .sidebar ul {
+            list-style: none;
+        }
+
+        .sidebar li {
+            margin: 20px 0;
+        }
+
+        .sidebar a, .sidebar button {
+            color: #fff;
+            text-decoration: none;
+            font-size: 18px;
+            display: block;
+            padding: 15px;
+            border-radius: 10px;
+            transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+            position: relative;
+            overflow: hidden;
+            background: none;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            text-align: left;
+        }
+
+        .sidebar a::before, .sidebar button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(76,175,80,0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .sidebar a:hover, .sidebar button:hover {
+            background: rgba(76, 175, 80, 0.2);
+            transform: translateX(10px);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .sidebar a:hover::before, .sidebar button:hover::before {
+            left: 100%;
+        }
+
+        .sidebar a:active, .sidebar button:active {
+            transform: translateX(5px) scale(0.98);
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .header {
+            text-align: center;
+            margin: 50px 0;
+        }
+
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(255,255,255,0.3);
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from {
+                text-shadow: 2px 2px 4px rgba(255,255,255,0.3), 0 0 10px rgba(76,175,80,0.3);
+            }
+            to {
+                text-shadow: 2px 2px 4px rgba(255,255,255,0.5), 0 0 20px rgba(76,175,80,0.5), 0 0 30px rgba(76,175,80,0.3);
+            }
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.8;
+        }
+
+        /* Product Grid */
+        .products {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin: 50px 0;
+        }
+
+        .product-card {
+            background: rgba(20, 20, 20, 0.8);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 0.6s ease-out forwards;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .product-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(76,175,80,0.1) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .product-card:hover::before {
+            opacity: 1;
+        }
+
+        .product-card:hover {
+            transform: translateY(-15px) scale(1.02);
+            box-shadow: 0 25px 50px rgba(76,175,80,0.2), 0 0 0 1px rgba(76,175,80,0.3);
+            border-color: rgba(76,175,80,0.5);
+        }
+
+        .product-card:nth-child(1) { animation-delay: 0.1s; }
+        .product-card:nth-child(2) { animation-delay: 0.2s; }
+        .product-card:nth-child(3) { animation-delay: 0.3s; }
+        .product-card:nth-child(4) { animation-delay: 0.4s; }
+        .product-card:nth-child(5) { animation-delay: 0.5s; }
+        .product-card:nth-child(6) { animation-delay: 0.6s; }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .product-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(45deg, #333, #555);
+            border-radius: 10px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3em;
+            color: rgba(255, 255, 255, 0.3);
+            transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .product-image::before {
+            content: '';
+            position: absolute;
+            top: -100%;
+            left: -100%;
+            width: 300%;
+            height: 300%;
+            background: linear-gradient(45deg, transparent, rgba(76,175,80,0.2), transparent);
+            transition: all 0.6s ease;
+            transform: rotate(45deg);
+        }
+
+        .product-card:hover .product-image {
+            transform: scale(1.05);
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+        }
+
+        .product-card:hover .product-image::before {
+            top: -50%;
+            left: -50%;
+        }
+
+        .product-card:hover .product-image {
+            color: rgba(255, 255, 255, 0.8);
+            animation: bounce 0.6s ease;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: scale(1.05) translateY(0); }
+            50% { transform: scale(1.05) translateY(-10px); }
+        }
+
+        .product-title {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+
+        .product-description {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .product-price {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #4CAF50;
+            margin-bottom: 15px;
+        }
+
+        .buy-button {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .buy-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .buy-button:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(76, 175, 80, 0.4);
+            background: linear-gradient(45deg, #45a049, #4CAF50);
+        }
+
+        .buy-button:hover::before {
+            left: 100%;
+        }
+
+        .buy-button:active {
+            transform: translateY(0) scale(0.98);
+            box-shadow: 0 2px 10px rgba(76, 175, 80, 0.3);
+        }
+
+        /* Owner Info */
+        .owner-info {
+            background: rgba(20, 20, 20, 0.8);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            margin: 50px 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .owner-info::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #4CAF50, #45a049, #4CAF50);
+            border-radius: 17px;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .owner-info:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(76, 175, 80, 0.2);
+        }
+
+        .owner-info:hover::before {
+            opacity: 1;
+        }
+
+        .owner-info h2 {
+            margin-bottom: 20px;
+            color: #4CAF50;
+        }
+
+        .contact-info {
+            font-size: 1.2em;
+            margin: 10px 0;
+        }
+
+        .phone-number {
+            font-size: 1.5em;
+            color: #4CAF50;
+            font-weight: bold;
+            margin: 15px 0;
+        }
+
+        /* Pricing Page */
+        .pricing-page {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 2000;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .pricing-page.active {
+            display: block;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .pricing-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 20px 0;
+        }
+
+        .close-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: #fff;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .price-card {
+            background: rgba(20, 20, 20, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            animation: priceCardIn 0.5s ease-out forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .price-card:nth-child(1) { animation-delay: 0.1s; }
+        .price-card:nth-child(2) { animation-delay: 0.2s; }
+        .price-card:nth-child(3) { animation-delay: 0.3s; }
+        .price-card:nth-child(4) { animation-delay: 0.4s; }
+        .price-card:nth-child(5) { animation-delay: 0.5s; }
+        .price-card:nth-child(6) { animation-delay: 0.6s; }
+
+        @keyframes priceCardIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .price-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(76, 175, 80, 0.2);
+            border-color: rgba(76, 175, 80, 0.3);
+        }
+
+        .price-card h3 {
+            color: #4CAF50;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+
+        .price-card .price {
+            font-size: 2em;
+            font-weight: bold;
+            color: #fff;
+            margin: 15px 0;
+        }
+
+        .price-card .description {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .products {
+                grid-template-columns: 1fr;
+            }
+            
+            .cursor-shadow {
+                display: none;
+            }
+            
+            body {
+                cursor: default;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="cursor-shadow"></div>
+    
+    <!-- Menu Toggle -->
+    <div class="menu-toggle" onclick="toggleMenu()">
+        <div class="menu-lines"></div>
+        <div class="menu-lines"></div>
+        <div class="menu-lines"></div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <ul>
+            <li><button onclick="showPricingPage()">Pricing</button></li>
+            <li><a href="#owner" onclick="scrollToSection('owner')">Owner</a></li>
+        </ul>
+    </div>
+
+    <!-- Pricing Page -->
+    <div class="pricing-page" id="pricingPage">
+        <div class="pricing-header">
+            <h2 style="color: #4CAF50; font-size: 2.5em;">💰 Daftar Harga</h2>
+            <button class="close-btn" onclick="closePricingPage()">✕ Tutup</button>
+        </div>
+        <div class="pricing-grid">
+            <div class="price-card">
+                <h3>📱 Smartphone Pro</h3>
+                <div class="price">Rp 8.999.000</div>
+                <div class="description">Flagship smartphone terbaru dengan performa tinggi</div>
+            </div>
+            <div class="price-card">
+                <h3>💻 Laptop Gaming</h3>
+                <div class="price">Rp 15.750.000</div>
+                <div class="description">Laptop gaming dengan spesifikasi premium</div>
+            </div>
+            <div class="price-card">
+                <h3>🎧 Headphone Wireless</h3>
+                <div class="price">Rp 2.499.000</div>
+                <div class="description">Headphone wireless dengan noise cancelling</div>
+            </div>
+            <div class="price-card">
+                <h3>⌚ Smartwatch</h3>
+                <div class="price">Rp 4.250.000</div>
+                <div class="description">Smartwatch dengan fitur kesehatan lengkap</div>
+            </div>
+            <div class="price-card">
+                <h3>📷 Kamera Mirrorless</h3>
+                <div class="price">Rp 12.500.000</div>
+                <div class="description">Kamera profesional full-frame</div>
+            </div>
+            <div class="price-card">
+                <h3>🖥️ Monitor 4K</h3>
+                <div class="price">Rp 6.750.000</div>
+                <div class="description">Monitor 4K UHD 27 inci untuk professional</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <header class="header">
+            <h1>Shadow Store</h1>
+            <p>Koleksi Produk Premium dengan Kualitas Terbaik</p>
+        </header>
+
+        <section class="products" id="pricing">
+            <div class="product-card">
+                <div class="product-image">📱</div>
+                <h3 class="product-title">Smartphone Pro</h3>
+                <p class="product-description">Smartphone flagship dengan performa tinggi, kamera canggih, dan desain elegan yang cocok untuk aktivitas sehari-hari.</p>
+                <div class="product-price">Rp 8.999.000</div>
+                <button class="buy-button">Beli Sekarang</button>
+            </div>
+
+            <div class="product-card">
+                <div class="product-image">💻</div>
+                <h3 class="product-title">Laptop Gaming</h3>
+                <p class="product-description">Laptop gaming powerful dengan spesifikasi tinggi, ideal untuk gaming, editing, dan multitasking berat.</p>
+                <div class="product-price">Rp 15.750.000</div>
+                <button class="buy-button">Beli Sekarang</button>
+            </div>
+
+            <div class="product-card">
+                <div class="product-image">🎧</div>
+                <h3 class="product-title">Headphone Wireless</h3>
+                <p class="product-description">Headphone wireless premium dengan noise cancelling, kualitas suara jernih, dan battery life hingga 30 jam.</p>
+                <div class="product-price">Rp 2.499.000</div>
+                <button class="buy-button">Beli Sekarang</button>
+            </div>
+
+            <div class="product-card">
+                <div class="product-image">⌚</div>
+                <h3 class="product-title">Smartwatch</h3>
+                <p class="product-description">Smartwatch dengan fitur kesehatan lengkap, GPS, dan konektivitas yang sempurna untuk gaya hidup aktif.</p>
+                <div class="product-price">Rp 4.250.000</div>
+                <button class="buy-button">Beli Sekarang</button>
+            </div>
+
+            <div class="product-card">
+                <div class="product-image">📷</div>
+                <h3 class="product-title">Kamera Mirrorless</h3>
+                <p class="product-description">Kamera mirrorless profesional dengan sensor full-frame, cocok untuk photography dan videography berkualitas tinggi.</p>
+                <div class="product-price">Rp 12.500.000</div>
+                <button class="buy-button">Beli Sekarang</button>
+            </div>
+
+            <div class="product-card">
+                <div class="product-image">🖥️</div>
+                <h3 class="product-title">Monitor 4K</h3>
+                <p class="product-description">Monitor 4K UHD 27 inci dengan color accuracy tinggi, refresh rate 144Hz, ideal untuk gaming dan professional work.</p>
+                <div class="product-price">Rp 6.750.000</div>
+                <button class="buy-button">Beli Sekarang</button>
+            </div>
+        </section>
+
+        <section class="owner-info" id="owner">
+            <h2>Informasi Pemilik</h2>
+            <div class="contact-info">
+                <p><strong>Nama:</strong> Ahmad Rizki</p>
+                <p><strong>Email:</strong> ahmad.rizki@shadowstore.com</p>
+                <div class="phone-number">📞 +62 821-3456-7890</div>
+                <p><strong>Alamat:</strong> Jl. Sudirman No. 123, Jakarta Pusat</p>
+                <p><strong>Instagram:</strong> @shadowstore_official</p>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // Cursor Shadow Effect
+        const shadow = document.querySelector('.cursor-shadow');
+        
+        document.addEventListener('mousemove', (e) => {
+            shadow.style.left = e.clientX + 'px';
+            shadow.style.top = e.clientY + 'px';
+        });
+
+        // Cursor hover effects
+        const hoverElements = document.querySelectorAll('.product-card, .buy-button, .menu-toggle, .sidebar a, .sidebar button, .owner-info, .close-btn, .price-card');
+        
+        hoverElements.forEach(element => {
+            element.addEventListener('mouseenter', () => {
+                shadow.classList.add('hover');
+            });
+            
+            element.addEventListener('mouseleave', () => {
+                shadow.classList.remove('hover');
+            });
+        });
+
+        // Cursor click effect
+        document.addEventListener('mousedown', () => {
+            shadow.classList.add('click');
+        });
+
+        document.addEventListener('mouseup', () => {
+            shadow.classList.remove('click');
+        });
+
+        // Menu Toggle
+        function toggleMenu() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        // Show Pricing Page
+        function showPricingPage() {
+            const pricingPage = document.getElementById('pricingPage');
+            pricingPage.classList.add('active');
+            toggleMenu(); // Close sidebar
+        }
+
+        // Close Pricing Page
+        function closePricingPage() {
+            const pricingPage = document.getElementById('pricingPage');
+            pricingPage.classList.remove('active');
+        }
+
+        // Scroll to Section
+        function scrollToSection(sectionId) {
+            const element = document.getElementById(sectionId);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+                toggleMenu(); // Close menu after clicking
+            }
+        }
+
+        // Close menu when clicking outside
+        document.addEventListener('click', (e) => {
+            const sidebar = document.getElementById('sidebar');
+            const menuToggle = document.querySelector('.menu-toggle');
+            
+            if (!sidebar.contains(e.target) && !menuToggle.contains(e.target)) {
+                sidebar.classList.remove('active');
+            }
+        });
+
+        // Add click effect to product cards
+        document.querySelectorAll('.product-card').forEach((card, index) => {
+            // Stagger animation
+            card.style.animationDelay = `${index * 0.1}s`;
+            
+            card.addEventListener('click', function(e) {
+                if (!e.target.classList.contains('buy-button')) {
+                    this.style.transform = 'translateY(-15px) scale(0.98)';
+                    setTimeout(() => {
+                        this.style.transform = '';
+                    }, 200);
+                }
+            });
+
+            // Add ripple effect
+            card.addEventListener('click', function(e) {
+                const ripple = document.createElement('div');
+                const rect = this.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = e.clientX - rect.left - size / 2;
+                const y = e.clientY - rect.top - size / 2;
+                
+                ripple.style.cssText = `
+                    position: absolute;
+                    width: ${size}px;
+                    height: ${size}px;
+                    left: ${x}px;
+                    top: ${y}px;
+                    background: radial-gradient(circle, rgba(76,175,80,0.3) 0%, transparent 70%);
+                    border-radius: 50%;
+                    transform: scale(0);
+                    animation: ripple 0.6s ease-out;
+                    pointer-events: none;
+                    z-index: 1;
+                `;
+                
+                this.appendChild(ripple);
+                
+                setTimeout(() => {
+                    ripple.remove();
+                }, 600);
+            });
+        });
+
+        // Add ripple animation keyframes
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes ripple {
+                to {
+                    transform: scale(2);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Close pricing page with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closePricingPage();
+            }
+        });
+
+        // Add animation to pricing cards when page opens
+        document.getElementById('pricingPage').addEventListener('transitionend', function() {
+            if (this.classList.contains('active')) {
+                const cards = this.querySelectorAll('.price-card');
+                cards.forEach((card, index) => {
+                    card.style.animationDelay = `${index * 0.1}s`;
+                });
+            }
+        });
+
+        // Buy button functionality with WhatsApp integration
+        document.querySelectorAll('.buy-button').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.stopPropagation();
+                
+                // Button animation
+                this.style.transform = 'translateY(0) scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 150);
+                
+                const productTitle = this.parentElement.querySelector('.product-title').textContent;
+                const productPrice = this.parentElement.querySelector('.product-price').textContent;
+                
+                // Success animation
+                const originalText = this.textContent;
+                this.textContent = '✓ Mengarahkan...';
+                this.style.background = 'linear-gradient(45deg, #4CAF50, #66BB6A)';
+                
+                // WhatsApp message
+                const phoneNumber = '6282134567890'; // Nomor WhatsApp (format internasional tanpa +)
+                const message = `Halo! Saya tertarik dengan produk *${productTitle}* dengan harga ${productPrice}. Bisakah saya mendapatkan informasi lebih lanjut?`;
+                const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+                
+                setTimeout(() => {
+                    this.textContent = originalText;
+                    this.style.background = 'linear-gradient(45deg, #4CAF50, #45a049)';
+                    // Open WhatsApp in new tab
+                    window.open(whatsappUrl, '_blank');
+                }, 1000);
+            });
+        });
+    </script>
+</body>
+</html>
