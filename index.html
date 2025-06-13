@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mirai Kanade Digital Marketplace</title>
+    <title>Mirai Kanade Digital Market</title>
     <style>
         * {
             margin: 0;
@@ -261,6 +261,16 @@
             overflow: hidden;
         }
 
+        /* Image styling - Fixed untuk memenuhi container */
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Mengubah dari contain ke cover */
+            object-position: center; /* Memastikan gambar terpusat */
+            border-radius: 10px;
+            transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
         .product-image::before {
             content: '';
             position: absolute;
@@ -271,11 +281,11 @@
             background: linear-gradient(45deg, transparent, rgba(76,175,80,0.2), transparent);
             transition: all 0.6s ease;
             transform: rotate(45deg);
+            z-index: 1;
         }
 
         .product-card:hover .product-image {
             transform: scale(1.05);
-            background: linear-gradient(45deg, #4CAF50, #45a049);
         }
 
         .product-card:hover .product-image::before {
@@ -283,9 +293,9 @@
             left: -50%;
         }
 
-        .product-card:hover .product-image {
-            color: rgba(255, 255, 255, 0.8);
-            animation: bounce 0.6s ease;
+        .product-card:hover .product-image img {
+            transform: scale(1.1);
+            filter: brightness(1.1) saturate(1.2);
         }
 
         @keyframes bounce {
@@ -518,12 +528,16 @@
             font-size: 0.9em;
             line-height: 1.4;
         }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
             .header h1 {
                 font-size: 2em;
             }
             
             .products {
                 grid-template-columns: 1fr;
+                gap: 20px;
             }
             
             .cursor-shadow {
@@ -532,6 +546,37 @@
             
             body {
                 cursor: default;
+            }
+            
+            .container {
+                padding: 10px;
+            }
+            
+            .header p {
+                font-size: 1em;
+            }
+            
+            .product-image {
+                height: 180px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.5em;
+            }
+            
+            .product-image {
+                height: 160px;
+            }
+            
+            .product-title {
+                font-size: 1.2em;
+            }
+            
+            .buy-button {
+                padding: 10px 20px;
+                font-size: 0.9em;
             }
         }
     </style>
@@ -601,242 +646,24 @@
         </header>
 
         <section class="products" id="pricing">
-     <div class="product-card">
-    <div class="product-image">
-        <img src="https://fastrestapis.fasturl.cloud/file/v2/VEV9oxk.jpg" alt="Smartwatch" style="width: 100%; height: auto; max-height: 200px; object-fit: contain;" />
-    </div>
-    <h3 class="product-title">Smartwatch</h3>
-    <p class="product-description">Smartwatch dengan fitur kesehatan lengkap, GPS, dan konektivitas yang sempurna untuk gaya hidup aktif.</p>
-    <div class="product-price">Rp 4.250.000</div>
-    <button class="buy-button">Beli Sekarang</button>
-</div>
+            <div class="product-card">
+                <div class="product-image">
+                    <img src="https://fastrestapis.fasturl.cloud/file/v2/VEV9oxk.jpg" alt="Smartwatch Premium" />
+                </div>
+                <h3 class="product-title">Smartwatch Premium</h3>
+                <p class="product-description">Smartwatch dengan fitur kesehatan lengkap, GPS, dan konektivitas yang sempurna untuk gaya hidup aktif.</p>
+                <div class="product-price">Rp 4.250.000</div>
+                <button class="buy-button">Beli Sekarang</button>
+            </div>
 
             <div class="product-card">
-    <div class="product-image">
-        <img src="https://fastrestapis.fasturl.cloud/file/v2/CiqJ7NR.jpg" alt="Smartwatch" style="width: 100%; height: auto; max-height: 200px; object-fit: contain;" />
-    </div>
-    <h3 class="product-title">Smartwatch</h3>
-    <p class="product-description">Smartwatch dengan fitur kesehatan lengkap, GPS, dan konektivitas yang sempurna untuk gaya hidup aktif.</p>
-    <div class="product-price">Rp 4.250.000</div>
-    <button class="buy-button">Beli Sekarang</button>
-</div>
-
-        <div class="product-card">
-    <div class="product-image">
-        <img src="https://fastrestapis.fasturl.cloud/file/v2/5NCAW6g.jpg" alt="Smartwatch" style="width: 100%; height: auto; max-height: 200px; object-fit: contain;" />
-    </div>
-    <h3 class="product-title">Smartwatch</h3>
-    <p class="product-description">Smartwatch dengan fitur kesehatan lengkap, GPS, dan konektivitas yang sempurna untuk gaya hidup aktif.</p>
-    <div class="product-price">Rp 4.250.000</div>
-    <button class="buy-button">Beli Sekarang</button>
-</div>    
-
-          <div class="product-card">
-    <div class="product-image">
-        <img src="https://fastrestapis.fasturl.cloud/file/v2/Z4DLiOy.jpg" alt="Smartwatch" style="width: 100%; height: auto; max-height: 200px; object-fit: contain;" />
-    </div>
-    <h3 class="product-title">Smartwatch</h3>
-    <p class="product-description">Smartwatch dengan fitur kesehatan lengkap, GPS, dan konektivitas yang sempurna untuk gaya hidup aktif.</p>
-    <div class="product-price">Rp 4.250.000</div>
-    <button class="buy-button">Beli Sekarang</button>
-</div>
-
-         <div class="product-card">
-    <div class="product-image">
-        <img src="https://fastrestapis.fasturl.cloud/file/v2/IyHc298.jpg" alt="Smartwatch" style="width: 100%; height: auto; max-height: 200px; object-fit: contain;" />
-    </div>
-    <h3 class="product-title">Smartwatch</h3>
-    <p class="product-description">Smartwatch dengan fitur kesehatan lengkap, GPS, dan konektivitas yang sempurna untuk gaya hidup aktif.</p>
-    <div class="product-price">Rp 4.250.000</div>
-    <button class="buy-button">Beli Sekarang</button>
-         </div>
-            
-        <section class="owner-info" id="owner">
-            <h2>Informasi Pemilik</h2>
-            <div class="contact-info">
-                <p><strong>Nama:</strong> Ahmad Rizki</p>
-                <p><strong>Email:</strong> ahmad.rizki@shadowstore.com</p>
-                <div class="phone-number">📞 +62 821-3456-7890</div>
-                <p><strong>Alamat:</strong> Jl. Sudirman No. 123, Jakarta Pusat</p>
-                <p><strong>Instagram:</strong> @shadowstore_official</p>
+                <div class="product-image">
+                    <img src="https://fastrestapis.fasturl.cloud/file/v2/CiqJ7NR.jpg" alt="Smartphone Gaming" />
+                </div>
+                <h3 class="product-title">Smartphone Gaming</h3>
+                <p class="product-description">Smartphone gaming dengan performa tinggi, layar AMOLED, dan sistem pendinginan canggih.</p>
+                <div class="product-price">Rp 8.999.000</div>
+                <button class="buy-button">Beli Sekarang</button>
             </div>
-        </section>
-    </div>
 
-    <script>
-        // Cursor Shadow Effect
-        const shadow = document.querySelector('.cursor-shadow');
-        
-        document.addEventListener('mousemove', (e) => {
-            shadow.style.left = e.clientX + 'px';
-            shadow.style.top = e.clientY + 'px';
-        });
-
-        // Cursor hover effects
-        const hoverElements = document.querySelectorAll('.product-card, .buy-button, .menu-toggle, .sidebar a, .sidebar button, .owner-info, .close-btn, .price-card');
-        
-        hoverElements.forEach(element => {
-            element.addEventListener('mouseenter', () => {
-                shadow.classList.add('hover');
-            });
-            
-            element.addEventListener('mouseleave', () => {
-                shadow.classList.remove('hover');
-            });
-        });
-
-        // Cursor click effect
-        document.addEventListener('mousedown', () => {
-            shadow.classList.add('click');
-        });
-
-        document.addEventListener('mouseup', () => {
-            shadow.classList.remove('click');
-        });
-
-        // Menu Toggle
-        function toggleMenu() {
-            const sidebar = document.getElementById('sidebar');
-            sidebar.classList.toggle('active');
-        }
-
-        // Show Pricing Page
-        function showPricingPage() {
-            const pricingPage = document.getElementById('pricingPage');
-            pricingPage.classList.add('active');
-            toggleMenu(); // Close sidebar
-        }
-
-        // Close Pricing Page
-        function closePricingPage() {
-            const pricingPage = document.getElementById('pricingPage');
-            pricingPage.classList.remove('active');
-        }
-
-        // Scroll to Section
-        function scrollToSection(sectionId) {
-            const element = document.getElementById(sectionId);
-            if (element) {
-                element.scrollIntoView({ behavior: 'smooth' });
-                toggleMenu(); // Close menu after clicking
-            }
-        }
-
-        // Close menu when clicking outside
-        document.addEventListener('click', (e) => {
-            const sidebar = document.getElementById('sidebar');
-            const menuToggle = document.querySelector('.menu-toggle');
-            
-            if (!sidebar.contains(e.target) && !menuToggle.contains(e.target)) {
-                sidebar.classList.remove('active');
-            }
-        });
-
-        // Add click effect to product cards
-        document.querySelectorAll('.product-card').forEach((card, index) => {
-            // Stagger animation
-            card.style.animationDelay = `${index * 0.1}s`;
-            
-            card.addEventListener('click', function(e) {
-                if (!e.target.classList.contains('buy-button')) {
-                    this.style.transform = 'translateY(-15px) scale(0.98)';
-                    setTimeout(() => {
-                        this.style.transform = '';
-                    }, 200);
-                }
-            });
-
-            // Add ripple effect
-            card.addEventListener('click', function(e) {
-                const ripple = document.createElement('div');
-                const rect = this.getBoundingClientRect();
-                const size = Math.max(rect.width, rect.height);
-                const x = e.clientX - rect.left - size / 2;
-                const y = e.clientY - rect.top - size / 2;
-                
-                ripple.style.cssText = `
-                    position: absolute;
-                    width: ${size}px;
-                    height: ${size}px;
-                    left: ${x}px;
-                    top: ${y}px;
-                    background: radial-gradient(circle, rgba(76,175,80,0.3) 0%, transparent 70%);
-                    border-radius: 50%;
-                    transform: scale(0);
-                    animation: ripple 0.6s ease-out;
-                    pointer-events: none;
-                    z-index: 1;
-                `;
-                
-                this.appendChild(ripple);
-                
-                setTimeout(() => {
-                    ripple.remove();
-                }, 600);
-            });
-        });
-
-        // Add ripple animation keyframes
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes ripple {
-                to {
-                    transform: scale(2);
-                    opacity: 0;
-                }
-            }
-        `;
-        document.head.appendChild(style);
-
-        // Close pricing page with Escape key
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                closePricingPage();
-            }
-        });
-
-        // Add animation to pricing cards when page opens
-        document.getElementById('pricingPage').addEventListener('transitionend', function() {
-            if (this.classList.contains('active')) {
-                const cards = this.querySelectorAll('.price-card');
-                cards.forEach((card, index) => {
-                    card.style.animationDelay = `${index * 0.1}s`;
-                });
-            }
-        });
-
-        // Buy button functionality with WhatsApp integration
-        document.querySelectorAll('.buy-button').forEach(button => {
-            button.addEventListener('click', function(e) {
-                e.stopPropagation();
-                
-                // Button animation
-                this.style.transform = 'translateY(0) scale(0.95)';
-                setTimeout(() => {
-                    this.style.transform = '';
-                }, 150);
-                
-                const productTitle = this.parentElement.querySelector('.product-title').textContent;
-                const productPrice = this.parentElement.querySelector('.product-price').textContent;
-                
-                // Success animation
-                const originalText = this.textContent;
-                this.textContent = '✓ Mengarahkan...';
-                this.style.background = 'linear-gradient(45deg, #4CAF50, #66BB6A)';
-                
-                // WhatsApp message
-                const phoneNumber = '6282134567890'; // Nomor WhatsApp (format internasional tanpa +)
-                const message = `Halo! Saya tertarik dengan produk *${productTitle}* dengan harga ${productPrice}. Bisakah saya mendapatkan informasi lebih lanjut?`;
-                const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
-                
-                setTimeout(() => {
-                    this.textContent = originalText;
-                    this.style.background = 'linear-gradient(45deg, #4CAF50, #45a049)';
-                    // Open WhatsApp in new tab
-                    window.open(whatsappUrl, '_blank');
-                }, 1000);
-            });
-        });
-    </script>
-</body>
-</html>
+            <div class="
